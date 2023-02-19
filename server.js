@@ -4,6 +4,8 @@ const express     = require('express');
 const bodyParser  = require('body-parser');
 const expect      = require('chai').expect;
 const cors        = require('cors');
+const myDb        = require('./mongooseConnect.js');
+const ObjectID    = require('mongodb').ObjectID;
 require('dotenv').config();
 
 const apiRoutes         = require('./routes/api.js');
@@ -20,7 +22,38 @@ app.use(cors({origin: '*'})); //For FCC testing purposes only
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(function(req, res, next){
+  console.log(req.method + " " + req.path + " - " + req.ip );
+next()
+});
+app.route("/api/issues/:project")
 
+  .put(function(req, res, next){
+   console.log(req.body)
+     if(req.body._id){
+      req.body = Object.keys(req.body).reduce(function(obj, key){
+        if(req.body[key]) obj[key] = req.body[key];
+        return obj;
+      }, {});
+        if(!ObjectID.isValid(req.body._id)){
+          console.log("could not update")
+          res.json({ error: 'could not update', '_id': req.body._id })
+      }else{
+        next();
+      }
+    }else{
+      res.json({error: "missing _id"});
+    };
+   })
+
+   .delete(function(req, res, next){
+    if(req.body._id){
+      next();
+    }else{
+      res.json({error: "missing _id"});
+    };
+   })
+   
 //Sample front-end
 app.route('/:project/')
   .get(function (req, res) {
@@ -37,7 +70,11 @@ app.route('/')
 fccTestingRoutes(app);
 
 //Routing for API 
-apiRoutes(app);  
+myDb((Issues) => {
+ 
+  apiRoutes(app, Issues)
+
+})
     
 //404 Not Found Middleware
 app.use(function(req, res, next) {
