@@ -29,18 +29,17 @@ next()
 app.route("/api/issues/:project")
 
   .put(function(req, res, next){
-   console.log(req.body)
-     if(req.body._id){
+    if(req.body._id){
       req.body = Object.keys(req.body).reduce(function(obj, key){
         if(req.body[key]) obj[key] = req.body[key];
         return obj;
       }, {});
-        if(!ObjectID.isValid(req.body._id)){
-          console.log("could not update")
-          res.json({ error: 'could not update', '_id': req.body._id })
+
+      if(Object.keys(req.body).length == 1){
+        res.json({error: "no update field(s) sent", _id: req.body._id});
       }else{
         next();
-      }
+      };
     }else{
       res.json({error: "missing _id"});
     };
@@ -71,9 +70,7 @@ fccTestingRoutes(app);
 
 //Routing for API 
 myDb((Issues) => {
- 
   apiRoutes(app, Issues)
-
 })
     
 //404 Not Found Middleware
