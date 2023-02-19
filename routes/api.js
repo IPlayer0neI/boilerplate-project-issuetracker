@@ -15,11 +15,8 @@ module.exports = function (app, Issues) {
     .get(function (req, res, next){
       let finds = Object.assign({}, req.params, req.query);
       
-      Issues.find(finds)
-        .select({__v: 0, project: 0})
-        .exec(function(err, documents){
-          console.log(documents)
-          res.send(documents);
+      Issues.find(finds, function(err, documents){
+          res.json(documents);
         });
     })
 
@@ -36,20 +33,15 @@ module.exports = function (app, Issues) {
     })
     
     .put(function(req, res, next){
-       Issues.findByIdAndUpdate(req.body._id, req.body, {new: true}, function(err, document){
-          if(err || !document){
-            console.log("could not update")
+      Issues.findByIdAndUpdate(req.body._id, req.body, {new: true}, function(err, document){
+        if(err || !document){
             res.json({error: 'could not update', _id: req.body._id});
-          }else if(Object.keys(req.body).length == 1){
-            console.log( 'no update field sent', req.body._id)
-           res.json({error: "no update field(s) sent", _id: req.body._id});
-         }else{
-            Issues.updateOne({_id: req.body._id},  { updated_on: new Date().toISOString()}, function(err, document){
-             console.log({result: "successfully updated", _id: req.body._id});
-              res.json({result: "successfully updated", _id: req.body._id});
-            });
-          }; 
-        });
+        }else{
+          Issues.updateOne({_id: req.body._id},  { updated_on: new Date().toISOString()}, function(err, document){
+            res.json({result: "successfully updated", _id: req.body._id});
+          });
+        }; 
+      });
     })
     
     .delete(function (req, res, next){
@@ -61,4 +53,14 @@ module.exports = function (app, Issues) {
          };
        });
     });
+
+    app.get("/api/issues/:project/delete", function(req, res){
+     Issues.deleteMany({project: req.params.project}, function(err){
+      if(err){
+        res.json({error: "Não deu para deletar"})
+      }else{
+        res.json({result: "Todas as instâncias de " + req.params.project + "foram apagadas"})
+      }
+     })
+    })
 };
