@@ -20,6 +20,7 @@ suite('Functional Tests', function() {
           })
           .end(function(err, res){
             let obj = JSON.parse(res.text);
+            assert.equal(res.status, 200);
             assert.equal(obj.issue_text, "All fields");
             done();
           });
@@ -36,6 +37,7 @@ suite('Functional Tests', function() {
               })
               .end(function(err, res){
                 let obj = JSON.parse(res.text);
+                assert.equal(res.status, 200);
                 assert.equal(obj.issue_text, "Required fields");
                 done();
               });
@@ -51,6 +53,7 @@ suite('Functional Tests', function() {
               })
               .end(function(err, res){
                 let obj = JSON.parse(res.text);
+                assert.equal(res.status, 200);
                 assert.equal(obj.error, "required field(s) missing");
                 done();
               });
@@ -64,6 +67,7 @@ suite('Functional Tests', function() {
           .get("/api/issues/Mytest")
           .end(function(err, res){
             let obj = JSON.parse(res.text);
+            assert.equal(res.status, 200);
             assert.isAbove(obj.length, 0);
             done();
           });
@@ -75,6 +79,7 @@ suite('Functional Tests', function() {
          .get("/api/issues/Mytest?status_text=Work")
          .end(function(err, res){
             let obj = JSON.parse(res.text)
+            assert.equal(res.status, 200);
             obj.forEach(function(issue){
               assert.equal(issue.status_text, "Work");
             });
@@ -88,6 +93,7 @@ suite('Functional Tests', function() {
           .get("/api/issues/Mytest?status_text=Work&issue_text=Noexist")
           .end(function(err, res){
             let obj = JSON.parse(res.text);
+            assert.equal(res.status, 200);
             assert.isUndefined(obj[0]);
             done();
         });
@@ -114,6 +120,7 @@ suite('Functional Tests', function() {
                 .send({_id: id, issue_text: "Put one field"})
                 .end(function(err, res){
                   let obj = JSON.parse(res.text);
+                  assert.equal(res.status, 200);
                   assert.equal(obj.result,"successfully updated");
                   done();
                 });
@@ -126,6 +133,7 @@ suite('Functional Tests', function() {
                   .send({_id: id, issue_text: "Put various field", assigned_to: "Puttest"})
                   .end(function(err, res){
                     let obj = JSON.parse(res.text);
+                    assert.equal(res.status, 200);
                     assert.equal(obj.result, "successfully updated");
                     done();
                   });
@@ -138,6 +146,7 @@ suite('Functional Tests', function() {
                   .send({})
                   .end(function(err, res){
                     let obj = JSON.parse(res.text);
+                    assert.equal(res.status, 200);
                     assert.equal(obj.error, "missing _id");
                     done();
                   });
@@ -150,6 +159,7 @@ suite('Functional Tests', function() {
                   .send({_id: id})
                   .end(function(err, res){
                     let obj = JSON.parse(res.text);
+                    assert.equal(res.status, 200);
                     assert.equal(obj.error, "no update field(s) sent");
                     done();
                   });
@@ -162,6 +172,7 @@ suite('Functional Tests', function() {
                   .send({_id: "NoValidId", issue_text: "put invalid id"})
                   .end(function(err, res){
                     let obj = JSON.parse(res.text);
+                    assert.equal(res.status, 200);
                     assert.equal(obj.error, "could not update");
                     done();
                   });
@@ -176,6 +187,7 @@ suite('Functional Tests', function() {
                 .send({_id: id})
                 .end(function(err, res){
                     let obj = JSON.parse(res.text);
+                    assert.equal(res.status, 200);
                     assert.equal(obj.result, "successfully deleted");
                     done();
                 });
@@ -188,6 +200,7 @@ suite('Functional Tests', function() {
                 .send({_id: "NovalidId"})
                 .end(function(err, res){
                   let obj = JSON.parse(res.text);
+                  assert.equal(res.status, 200);
                   assert.equal(obj.error, "could not delete");
                   done()
                 })
@@ -200,6 +213,7 @@ suite('Functional Tests', function() {
                   .send({})
                   .end(function(err, res){
                     let obj = JSON.parse(res.text);
+                    assert.equal(res.status, 200);
                     assert.equal(obj.error, "missing _id");
                     done()
                   })
